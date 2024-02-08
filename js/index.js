@@ -171,6 +171,26 @@ new Vue({
       >
         <a-icon type="setting" />
       </a-button>
+      <!-- 抽奖背景音乐 -->
+      <a-upload
+        class="operation-button import-users"
+        accept=".mp3"
+        :fileList="[]"
+        @change="onUploadMusicChange"
+      >
+        <a-button
+          :type="isImportMusic ? 'primary' : 'default'"
+          :loading="isLoading"
+        >
+          {{ isImportMusic ? '更新背景音乐' : '上传背景音乐' }}
+          <a-icon type="upload" />
+        </a-button>
+        <a-icon
+          v-if="isImportMusic"
+          class="operation-success-icon"
+          type="check-circle"
+        />
+      </a-upload>
       <!-- 重置按钮 -->
       <a-button
         class="operation-button"
@@ -200,7 +220,9 @@ new Vue({
       // 是否导入了用户列表
       isImportUsers: false,
       // 是否有自定义奖项配置
-      isImportMode: false
+      isImportMode: false,
+      // 是否导入了背景音乐
+      isImportMusic: false
     }
   },
   created() {
@@ -221,6 +243,9 @@ new Vue({
     // 获取抽奖用户
     const users = localStorage.getItem('users')
     this.isImportUsers = users ? JSON.parse(users).length : false
+    // 获取背景音乐
+    const music = localStorage.getItem('music')
+    this.isImportMusic = music ? true : false
     // 获取自定义抽奖项
     this.onCloseCustom()
   },
@@ -255,10 +280,29 @@ new Vue({
       // 清空状态
       this.isImportUsers = false
       this.isImportMode = false
+      this.isImportMusic = false
       this.modeType = 0
       this.winningType = 0
       // 提示
       this.$message.success('清理成功')
+    },
+    // 上传抽奖页背景音乐
+    onUploadMusicChange(info) {
+      // 创建文件读取对象
+      var reader = new FileReader()
+      // 读取回调
+      reader.onload = (e) => {
+        // 获取文件内容
+        const content = e.target.result
+        // 存储到 localStorage
+        localStorage.setItem('music', content)
+        // 标记为有数据
+        this.isImportMusic = true
+        // 提示
+        this.$message.success('上传背景音乐成功')
+      }
+      // 读取文件
+      reader.readAsDataURL(info.file.originFileObj)
     },
     // 上传之前检查
     beforeUpload(file, fileList) {

@@ -112,8 +112,17 @@ new Vue({
           {{ isLuckyDraw ?  luckyDrawTime ? '停止抽奖' : '结束本轮' : '开始抽奖' }}
         </a-button>
       </div>
+      <!-- 音乐播放/暂停 -->
+      <img
+        v-if="!!music"
+        src="./assets/music.svg"
+        :class="isMusicPlaying ? 'lucky-draw-music lucky-draw-music-play' : 'lucky-draw-music'"
+        @click="touchMusicPlaying"
+      />
+      <audio id="music" loop ></audio>
       <!-- 右边工具栏 -->
       <div class="lucky-draw-tool-right">
+        <a-button shape="circle" :icon="drawAnimateType == 'sphere' ? 'border' : 'global'" :disabled="isLuckyDraw" style="margin-right: 12px;" @click="switchDrawAnimateType" />
         <a-button shape="circle" icon="table" :disabled="isLuckyDraw" style="margin-right: 12px;" @click="showWinningUsers" />
         <a-button shape="circle" icon="download" :disabled="isLuckyDraw" @click="downloadWinningUsers" />
       </div>
@@ -146,7 +155,15 @@ new Vue({
       // 剩余未中奖人数
       surplusUsers: [],
       // 滚动定时器
-      luckyDrawTime: undefined
+      luckyDrawTime: undefined,
+      // 音乐数据
+      music: undefined,
+      // 音乐播放器
+      musicAudio: {},
+      // 是否正在播放中
+      isMusicPlaying: false,
+      // 结束动画类型只支持 sphere、helix
+      drawAnimateType: 'sphere'
     }
   },
   mounted() {
@@ -163,6 +180,12 @@ new Vue({
       this.winningType = Number(winningType)
     } else {
       this.winningType = 0
+    }
+    // 获取背景音乐
+    this.music = localStorage.getItem('music')
+    if (this.music) {
+      this.musicAudio = document.getElementById('music')
+      this.musicAudio.setAttribute('src', this.music)
     }
     // 获取自定义列表
     this.customs = JSON.parse(localStorage.getItem('customs')) || []
@@ -190,6 +213,22 @@ new Vue({
     }
   },
   methods: {
+    // 播放背景音乐
+    touchMusicPlaying() {
+      this.isMusicPlaying = !this.isMusicPlaying
+      if (this.isMusicPlaying) {
+        this.musicAudio.play()
+      } else {
+        this.musicAudio.pause()
+      }
+    },
+    // 切换抽奖动画
+    switchDrawAnimateType() {
+      this.drawAnimateType = this.drawAnimateType === 'sphere' ? 'helix' : 'sphere'
+      if (animateType === 'sphere' || animateType === 'helix') {
+        stopAnimate(this.drawAnimateType)
+      }
+    },
     // 切换奖项
     handleModeTypeChange(value, e) {
       // 记录奖项
@@ -231,12 +270,12 @@ new Vue({
     startLuckyDraw() {
       if (this.tempNumber != this.number) {
         this.tempNumber = this.number
-        if (animateType === 'sphere') {
+        if (animateType === 'sphere' || animateType === 'helix') {
           this.isLuckyDraw = true
           this.infiniteCycle()
           this.GetUsers()
         } else {
-          stopAnimate('sphere')
+          stopAnimate(this.drawAnimateType)
           setTimeout(() => {
             this.isLuckyDraw = true
             this.infiniteCycle()

@@ -33,10 +33,10 @@ var camera, scene, renderer
 
 // 名片3D坐标
 var objects = []
-var targets = { sphere: [], grid: [] }
+var targets = { sphere: [], helix: [], grid: [] }
 
 // 动画类型
-var animateTypes = ['sphere', 'grid', 'none']
+var animateTypes = ['sphere', 'grid', 'helix', 'none']
 var animateType = undefined
 var animateDuration = 2000
 
@@ -102,6 +102,21 @@ function init() {
 		vector.copy(object.position).multiplyScalar(2)
 		object.lookAt(vector)
 		targets.sphere.push(object)
+	}
+
+	// helix
+	var vector = new THREE.Vector3();
+	for (var i = 0, l = objects.length; i < l; i++) {
+		var phi = i * 1 + Math.PI;
+		var object = new THREE.Object3D();
+		object.position.x = 900 * Math.sin(phi);
+		object.position.y = - (i * 8) + 450;
+		object.position.z = 900 * Math.cos(phi);
+		vector.x = object.position.x * 2;
+		vector.y = object.position.y;
+		vector.z = object.position.z * 2;
+		object.lookAt(vector);
+		targets.helix.push(object);
 	}
 
 	// grid
@@ -206,6 +221,9 @@ function setAnimate(type) {
 	} else if (type === 'grid') {
 		// 有序的悬浮
 		transform(targets.grid, animateDuration)
+	} else if (type === 'helix') {
+		// 圆柱
+		transform(targets.helix, animateDuration)
 	} else {
 		// 无序的悬浮
 		transform(objects, animateDuration)

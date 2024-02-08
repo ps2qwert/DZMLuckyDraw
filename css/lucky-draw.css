@@ -193,3 +193,34 @@ body {
 .lucky-draw-tool-right .ant-btn {
   border-radius: 50%;
 }
+/* 背景音乐播放按钮（暂停状态） */
+.lucky-draw-music {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.7;
+  cursor: pointer;
+}
+/* 背景音乐播放按钮（播放状态） */
+.lucky-draw-music-play {
+  animation: autoRotate 3s linear infinite;
+}
+/* 音乐元素旋转动画 */
+@keyframes autoRotate {
+  from{
+      transform: rotate(0deg);
+  }
+  to{
+      transform: rotate(360deg);
+  } 
+}
+/* 切换抽奖类型 */
+.lucky-draw-animate-type {
+  cursor: pointer;
+  margin-right: 12px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.8;
+}
